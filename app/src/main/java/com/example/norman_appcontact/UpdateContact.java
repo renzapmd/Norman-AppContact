@@ -4,10 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.norman_appcontact.Contact;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +27,7 @@ import java.util.List;
 
 public class UpdateContact extends AppCompatActivity {
     EditText edtId,edtName,edtPhone,edtEmail;
+    ImageView imgPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +42,21 @@ public class UpdateContact extends AppCompatActivity {
         Intent intent = getIntent();
         final String key = intent.getStringExtra("Key");
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myref = database.getReference("contacts");
-        myref.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference myRef = database.getReference("contacts");
+        myRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                DataSnapshot childrenSnapshot = dataSnapshot.child(key);
-                Contact c = childrenSnapshot.getValue(Contact.class);
-                edtId.setText(key);
-                edtEmail.setText(c.getEmail());
-                edtName.setText(c.getName());
-                edtPhone.setText(c.getPhone());
+                Contact contact = dataSnapshot.getValue(Contact.class);
+                contact.setId(dataSnapshot.getKey());
+                edtId.setText(contact.getId());
+                edtEmail.setText(contact.getEmail());
+                edtName.setText(contact.getName());
+                edtPhone.setText(contact.getPhone());
+                if(contact.getPicture()!=null){
+                    byte[] decodedString = Base64.decode(contact.getPicture(), Base64.DEFAULT);
+                    Bitmap decodedBye = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    imgPicture.setImageBitmap(decodedBye);
+                }
 
             }
 
@@ -61,6 +72,7 @@ public class UpdateContact extends AppCompatActivity {
         edtEmail=findViewById(R.id.edtEmail);
         edtName=findViewById(R.id.edtName);
         edtPhone=findViewById(R.id.edtPhone);
+        imgPicture = (ImageView)findViewById(R.id.imageView);
     }
 
     public void updateContact(View view){
@@ -68,12 +80,19 @@ public class UpdateContact extends AppCompatActivity {
         String phone= edtPhone.getText().toString();
         String name=edtName.getText().toString();
         String email=edtEmail.getText().toString();
-        FirebaseDatabase database  = FirebaseDatabase.getInstance();
-        DatabaseReference myref = database.getReference("contacts");
-        myref.child(key).child("phone").setValue(phone);
-        myref.child(key).child("email").setValue(email);
-        myref.child(key).child("name").setValue(name);
-        finish();
+
+        if (!email.matches("") && !phone.matches("") && !name.matches("") && !key.matches("")) {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myref = database.getReference("contacts");
+            myref.child(key).child("phone").setValue(phone);
+            myref.child(key).child("email").setValue(email);
+            myref.child(key).child("name").setValue(name);
+            Intent intent = new Intent(UpdateContact.this, MainActivity.class);
+            finish();
+            startActivity(intent);
+        }
+        else
+            Toast.makeText(this,"Error:",Toast.LENGTH_LONG).show();
 
     }
 
@@ -82,7 +101,9 @@ public class UpdateContact extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("contacts");
         myRef.child(key).removeValue();
+        Intent intent = new Intent(UpdateContact.this, MainActivity.class);
         finish();
+        startActivity(intent);
 
     }
 }

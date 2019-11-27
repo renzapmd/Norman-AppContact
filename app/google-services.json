@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "41237204487",
+    "firebase_url": "https://norman-appcontact-ecc98.firebaseio.com",
+    "project_id": "norman-appcontact-ecc98",
+    "storage_bucket": "norman-appcontact-ecc98.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41237204487:android:242aa5d12bb68ea822a4a2",
+        "android_client_info": {
+          "package_name": "com.example.norman_appcontact"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "41237204487-ipjgncvgpmsmvk13enum5ooufmashavj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.norman_appcontact",
+            "certificate_hash": "998878d3cb2027f4ca4adc21dc6b4701380c0f50"
+          }
+        },
+        {
+          "client_id": "41237204487-lpma2dv9ha7jhaeeh3ck4nda9gts4ru2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv-HD5YaUcECgpzEp0lwGK_GwJknXlIOU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "41237204487-lpma2dv9ha7jhaeeh3ck4nda9gts4ru2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

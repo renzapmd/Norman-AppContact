@@ -1,6 +1,7 @@
 package com.example.norman_appcontact;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,6 +17,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.norman_appcontact.adapter.ContactAdapter;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,34 +28,54 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
     ListView lvContact;
-    ArrayAdapter<String> adapter;
+    ContactAdapter adapter;
     String TAG="FIREBASE";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        adapter=new ArrayAdapter<>(this,android.R.layout.simple_list_item_1);
-        lvContact=findViewById(R.id.lvContact);
-        lvContact.setAdapter(adapter);
+        addControl();
+        getContactsFromFirebase();
 
-//lấy đối tượng FirebaseDatabase
+        lvContact.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Contact contact = adapter.getItem(position);
+                String key = contact.getId();
+                Intent intent = new Intent(MainActivity.this, UpdateContact.class);
+                intent.putExtra("Key", key);
+                startActivity(intent);
+
+            }
+        });
+
+    }
+    public void addControl(){
+        lvContact = findViewById(R.id.lvContact);
+        adapter=new ContactAdapter(this, R.layout.item);
+        lvContact.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+    }
+
+    public void getContactsFromFirebase(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-//Kết nối tới node có tên là contacts (node này do ta định nghĩa trong CSDL Firebase)
         DatabaseReference myRef = database.getReference("contacts");
-//truy suất và lắng nghe sự thay đổi dữ liệu
+        adapter.clear();
+        adapter.notifyDataSetChanged();
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                adapter.clear();
-//vòng lặp để lấy dữ liệu khi có sự thay đổi trên Firebase
                 for (DataSnapshot data: dataSnapshot.getChildren())
                 {
-//lấy key của dữ liệu
-                    String key=data.getKey();
-//lấy giá trị của key (nội dung)
-                    String value=data.getValue().toString();
-                    adapter.add(key+"\n"+value);
+                 Contact contact = data.getValue(Contact.class);
+                 String key = data.getKey();
+                 contact.setId(key);
+                 adapter.add(contact);
                 }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -59,16 +83,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        lvContact.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String data = adapter.getItem(position);
-                String key = data.split("\n")[0];
-                Intent intent = new Intent(MainActivity.this, UpdateContact.class);
-                intent.putExtra("Key", key);
-                startActivity(intent);
-            }
-        });
+
     }
 
     @Override
@@ -85,8 +100,16 @@ public class MainActivity extends AppCompatActivity {
             Intent intent=new Intent(MainActivity.this,AddNewContact.class);
             startActivity(intent);
         }
+        else if(item.getItemId()==R.id.refresh)
+        {
+            finish();
+            startActivity(getIntent());
+        }
         return super.onOptionsItemSelected(item);
+
     }
+
+
 
 
 }
