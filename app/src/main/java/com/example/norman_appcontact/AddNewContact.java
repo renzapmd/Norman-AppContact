@@ -10,10 +10,14 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -22,12 +26,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class AddNewContact extends AppCompatActivity {
-
     EditText edtId, edtName, edtPhone, edtEmail;
     ImageView imgPicture;
-    ImageButton btnCapture, btnChoose;
+    ImageButton btnCapture;
+    ImageButton btnChoose;
     Bitmap selectedBitmap;
-
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseUser user = mAuth.getCurrentUser();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +48,7 @@ public class AddNewContact extends AppCompatActivity {
         edtPhone = findViewById(R.id.edtPhone);
         edtEmail = findViewById(R.id.edtEmail);
         // btnCapture = (ImageButton) findViewById(R.id.btnCapture);
-        btnChoose = (ImageButton) findViewById(R.id.btnChoose);
+        btnChoose = (ImageButton) findViewById(R.id.imageView);
         imgPicture = (ImageView) findViewById(R.id.imageView);
 
     }
@@ -93,24 +98,25 @@ public class AddNewContact extends AppCompatActivity {
     public void AddProcess(View view) {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("contacts");
+        DatabaseReference myRef = database.getReference();
+
 
         String id = edtId.getText().toString();
         String email = edtEmail.getText().toString();
         String name = edtName.getText().toString();
         String phone = edtPhone.getText().toString();
 
-        if (!email.matches("") && !phone.matches("") && !name.matches("") && !id.matches("")) {
-            myRef.child(id).child("email").setValue(email);
-            myRef.child(id).child("name").setValue(name);
-            myRef.child(id).child("phone").setValue(phone);
+        if (!email.matches("") && !phone.matches("") && !name.matches("") && !id.matches("") && !(selectedBitmap == null)) {
+            myRef.child(user.getUid()).child("contacts").child(id).child("email").setValue(email);
+            myRef.child(user.getUid()).child("contacts").child(id).child("name").setValue(name);
+            myRef.child(user.getUid()).child("contacts").child(id).child("phone").setValue(phone);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             selectedBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             String imgEncoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-            myRef.child(id).child("picture").setValue(imgEncoded);
-            Intent intent = new Intent(AddNewContact.this, MainActivity.class);
+            myRef.child(user.getUid()).child("contacts").child(id).child("picture").setValue(imgEncoded);
+            Intent intent = new Intent(AddNewContact.this, ContactList.class);
             finish();
             startActivity(intent);
         }

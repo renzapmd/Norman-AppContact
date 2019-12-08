@@ -6,21 +6,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.norman_appcontact.Contact;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +35,10 @@ import java.util.List;
 public class UpdateContact extends AppCompatActivity {
     EditText edtId,edtName,edtPhone,edtEmail;
     ImageView imgPicture;
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseUser user = mAuth.getCurrentUser();
+    ImageButton btnChoose;
+    Bitmap selectedBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,15 +46,15 @@ public class UpdateContact extends AppCompatActivity {
         setContentView(R.layout.activity_update_contact);
         addControl();
         getContactDetail();
-
+        addEvents();
     }
 
     public void getContactDetail(){
         Intent intent = getIntent();
         final String key = intent.getStringExtra("Key");
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("contacts");
-        myRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference myRef = database.getReference();
+        myRef.child(user.getUid()).child("contacts").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Contact contact = dataSnapshot.getValue(Contact.class);
@@ -66,6 +77,44 @@ public class UpdateContact extends AppCompatActivity {
             }
         });
     }
+    public void addEvents() {
+       /* btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                capturePicture();
+            }
+        });
+            */
+        btnChoose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ChoosePicture();
+            }
+        });
+    }
+    private void ChoosePicture() {
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto, 200);
+    }
+
+    /*private void capturePicture(){
+        Intent  cInt = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cInt, 100);
+    }*/
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            selectedBitmap = (Bitmap) data.getExtras().get("data");
+            imgPicture.setImageBitmap(selectedBitmap);
+        } else if (requestCode == 200 && resultCode == RESULT_OK) {
+            try {
+                Uri imageUri = data.getData();
+                selectedBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                imgPicture.setImageBitmap(selectedBitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void addControl(){
         edtId=findViewById(R.id.edtContactId);
@@ -73,6 +122,8 @@ public class UpdateContact extends AppCompatActivity {
         edtName=findViewById(R.id.edtName);
         edtPhone=findViewById(R.id.edtPhone);
         imgPicture = (ImageView)findViewById(R.id.imageView);
+        btnChoose = (ImageButton) findViewById(R.id.imageView);
+
     }
 
     public void updateContact(View view){
@@ -81,13 +132,19 @@ public class UpdateContact extends AppCompatActivity {
         String name=edtName.getText().toString();
         String email=edtEmail.getText().toString();
 
-        if (!email.matches("") && !phone.matches("") && !name.matches("") && !key.matches("")) {
+
+        if (!email.matches("") && !phone.matches("") && !name.matches("") && !key.matches("")&& !(selectedBitmap == null)) {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myref = database.getReference("contacts");
-            myref.child(key).child("phone").setValue(phone);
-            myref.child(key).child("email").setValue(email);
-            myref.child(key).child("name").setValue(name);
-            Intent intent = new Intent(UpdateContact.this, MainActivity.class);
+            DatabaseReference myref = database.getReference();
+            myref.child(user.getUid()).child("contacts").child(key).child("phone").setValue(phone);
+            myref.child(user.getUid()).child("contacts").child(key).child("email").setValue(email);
+            myref.child(user.getUid()).child("contacts").child(key).child("name").setValue(name);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            selectedBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            String imgEncoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            myref.child(user.getUid()).child("contacts").child(key).child("picture").setValue(imgEncoded);
+            Intent intent = new Intent(UpdateContact.this, ContactList.class);
             finish();
             startActivity(intent);
         }
@@ -99,9 +156,9 @@ public class UpdateContact extends AppCompatActivity {
     public void removeContact(View view){
         String key = edtId.getText().toString();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("contacts");
-        myRef.child(key).removeValue();
-        Intent intent = new Intent(UpdateContact.this, MainActivity.class);
+        DatabaseReference myRef = database.getReference();
+        myRef.child(user.getUid()).child("contacts").child(key).removeValue();
+        Intent intent = new Intent(UpdateContact.this, ContactList.class);
         finish();
         startActivity(intent);
 

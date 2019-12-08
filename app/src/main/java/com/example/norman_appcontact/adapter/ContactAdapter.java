@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -28,12 +29,14 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
     @Override
 
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        View custom=context.getLayoutInflater().inflate(resource,null);
-        TextView txtId=custom.findViewById(R.id.id);
-        TextView txtName=custom.findViewById(R.id.Name);
-        TextView txtPhone=custom.findViewById(R.id.Phone);
-        TextView txtEmail=custom.findViewById(R.id.Email);
-        ImageView imageView=custom.findViewById(R.id.imageView3);
+
+        convertView = LayoutInflater.from(getContext()).inflate(R.layout.item, parent, false);
+        TextView txtId=convertView.findViewById(R.id.id);
+
+        TextView txtName=convertView.findViewById(R.id.Name);
+        TextView txtPhone=convertView.findViewById(R.id.Phone);
+        TextView txtEmail=convertView.findViewById(R.id.Email);
+        ImageView imageView=convertView.findViewById(R.id.imageView3);
         Contact contact = getItem(position);
         txtId.setText("ID:" + contact.getId());
         txtName.setText(contact.getName());
@@ -44,7 +47,7 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
             Bitmap decodedBye = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             imageView.setImageBitmap(decodedBye);
         }
-        return custom;
+        return convertView;
     }
 
 
