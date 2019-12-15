@@ -8,16 +8,17 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import androidx.appcompat.widget.Toolbar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -26,7 +27,7 @@ public class SignUpActivity extends AppCompatActivity {
     EditText fname;
     EditText lname;
     EditText otherPass;
-
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +39,19 @@ public class SignUpActivity extends AppCompatActivity {
         fname = findViewById(R.id.signupName);
         lname = findViewById(R.id.signupLName);
         mAuth = FirebaseAuth.getInstance();
+        toolbar = findViewById(R.id.toolbarSignup);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Sign Up" );
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+
+
+            }
+        });
 
 
         findViewById(R.id.signupCancel).setOnClickListener(new View.OnClickListener() {
@@ -64,10 +78,10 @@ public class SignUpActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        // Sign in success, update UI with the signed-in user's information
                                         Log.d("test", "createUserWithEmail:success");
 
                                         FirebaseUser user = mAuth.getCurrentUser();
+
                                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                                 .setDisplayName(fname.getText().toString() + " " + lname.getText().toString())
                                                 .build();
@@ -84,14 +98,17 @@ public class SignUpActivity extends AppCompatActivity {
                                                         }
                                                     }
                                                 });
+                                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                        DatabaseReference myRef = database.getReference();
+                                        myRef.child(user.getUid()).child("userInfo").child("name").setValue(fname.getText().toString() + " " + lname.getText().toString());
+                                        myRef.child(user.getUid()).child("userInfo").child("email").setValue(emailField.getText().toString());
 
-                                        //updateUI(user);
+
+
                                     } else {
-                                        // If sign in fails, display a message to the user.
                                         Log.w("test", "createUserWithEmail:failure", task.getException());
                                         Toast.makeText(SignUpActivity.this, "Authentication failed.",
                                                 Toast.LENGTH_SHORT).show();
-                                        //updateUI(null);
                                     }
 
 

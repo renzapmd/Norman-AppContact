@@ -4,78 +4,60 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".AddNewContact"
-    android:layout_gravity="center">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    android:fitsSystemWindows="true"
+    tools:context=".ContactInfo">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        android:fitsSystemWindows="true">
 
-        <androidx.appcompat.widget.Toolbar
-            android:fitsSystemWindows="true"
-            android:id="@+id/toolbarNew"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/white"
-            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            android:fitsSystemWindows="true">
 
-    </com.google.android.material.appbar.AppBarLayout>
+            <androidx.appcompat.widget.Toolbar
+                android:fitsSystemWindows="true"
+                android:id="@+id/toolbarInfo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_anchor="@id/toolbarInfo"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@drawable/edit_profile" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_anchor="@id/infoPhone"
+        app:layout_anchorGravity="center|bottom|end"
+        app:srcCompat="@android:drawable/sym_action_call" />
 
 
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/appbar">
     <LinearLayout
-        android:layout_marginTop="10dp"
+         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginBottom="100dp"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         >
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageInfo"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/avatar_f_2" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imageView2"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center"
-                android:src="@drawable/select_avatar" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="bottom">
-
-                <Button  style="@style/Widget.AppCompat.Button.Colored"
-                    android:id="@+id/btnCapture"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="CAMERA"
-                    android:layout_gravity="bottom"/>
-
-                <Button  style="@style/Widget.AppCompat.Button.Colored"
-                    android:id="@+id/btnChoose"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="GALLERY" />
-            </LinearLayout>
-        </LinearLayout>
 
         <androidx.cardview.widget.CardView
             android:layout_height="wrap_content"
@@ -100,8 +82,8 @@
                     android:background="@color/colorPrimary"
                     android:layout_marginLeft="10dp"/>
 
-                <EditText
-                    android:id="@+id/edtContactId"
+                <TextView
+                    android:id="@+id/infoContactId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -140,8 +122,8 @@
                     android:background="@color/colorPrimary"
                     android:layout_marginLeft="10dp"/>
 
-                <EditText
-                    android:id="@+id/edtName"
+                <TextView
+                    android:id="@+id/infoName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -180,8 +162,8 @@
                     android:background="@color/colorPrimary"
                     android:layout_marginLeft="10dp"/>
 
-                <EditText
-                    android:id="@+id/edtPhone"
+                <TextView
+                    android:id="@+id/infoPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -219,8 +201,8 @@
                     android:background="@color/colorPrimary"
                     android:layout_marginLeft="10dp"/>
 
-                <EditText
-                    android:id="@+id/edtEmail"
+                <TextView
+                    android:id="@+id/infoEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -236,28 +218,7 @@
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
-        <Button style="@style/Widget.AppCompat.Button.Colored"
-            android:id="@+id/btnSubmit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="Add New Contact"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.547"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.737"
-            android:onClick="AddProcess"
-            android:layout_below="@id/edtPhone"
-            android:layout_gravity="center"
-            />
     </LinearLayout>
 
-</ScrollView>
-    </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

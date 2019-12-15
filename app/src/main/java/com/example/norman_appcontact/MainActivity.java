@@ -45,14 +45,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mAuth = FirebaseAuth.getInstance();
         emailField = findViewById(R.id.loginEmailField);
         passField = findViewById(R.id.loginPasswordField);
         passField.setTransformationMethod(new AsteriskPasswordTransformationMethod());
 
-        //To remember last password.
         SharedPreferences pref = getSharedPreferences("info", MODE_PRIVATE);
-
 
 
         findViewById(R.id.signupButton).setOnClickListener(new View.OnClickListener() {
@@ -72,20 +71,16 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
                                     Log.d("test", "signInWithEmail:success");
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     Intent contactListIntent = new Intent(MainActivity.this, ContactList.class);
                                     contactListIntent.putExtra(CONTACT_ADDED_KEY,false);
                                     startActivity(contactListIntent);
                                     finish();
-                                    //updateUI(user);
                                 } else {
-                                    // If sign in fails, display a message to the user.
                                     Log.w("test", "signInWithEmail:failure", task.getException());
                                     Toast.makeText(MainActivity.this, "Authentication failed.",
                                             Toast.LENGTH_SHORT).show();
-                                    //updateUI(null);
                                 }
 
 
@@ -102,15 +97,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
+       if(currentUser != null){
             Intent intent = new Intent(this, ContactList.class);
             intent.putExtra(CONTACT_ADDED_KEY,false);
             startActivity(intent);
             finish();
         }
-        //updateUI(currentUser);
     }
 }
 

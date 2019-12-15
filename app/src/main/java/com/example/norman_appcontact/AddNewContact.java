@@ -1,7 +1,9 @@
 package com.example.norman_appcontact;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,27 +20,34 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class AddNewContact extends AppCompatActivity {
     EditText edtId, edtName, edtPhone, edtEmail;
-    ImageView imgPicture;
-    ImageButton btnCapture;
-    ImageButton btnChoose;
+    CircleImageView imgPicture;
+    Button btnCapture;
+    Button btnChoose;
     Bitmap selectedBitmap;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_contact);
         addControls();
         addEvents();
+        setToolbar();
 
     }
 
@@ -47,20 +56,20 @@ public class AddNewContact extends AppCompatActivity {
         edtName = findViewById(R.id.edtName);
         edtPhone = findViewById(R.id.edtPhone);
         edtEmail = findViewById(R.id.edtEmail);
-        // btnCapture = (ImageButton) findViewById(R.id.btnCapture);
-        btnChoose = (ImageButton) findViewById(R.id.imageView);
-        imgPicture = (ImageView) findViewById(R.id.imageView);
+        btnCapture = (Button) findViewById(R.id.btnCapture);
+        btnChoose = (Button) findViewById(R.id.btnChoose);
+        imgPicture = (CircleImageView) findViewById(R.id.imageView2);
 
     }
 
     public void addEvents() {
-       /* btnCapture.setOnClickListener(new View.OnClickListener() {
+       btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 capturePicture();
             }
         });
-            */
+
         btnChoose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,10 +84,10 @@ public class AddNewContact extends AppCompatActivity {
         startActivityForResult(pickPhoto, 200);
     }
 
-    /*private void capturePicture(){
+    private void capturePicture(){
         Intent  cInt = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cInt, 100);
-    }*/
+    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100 && resultCode == RESULT_OK) {
@@ -123,5 +132,23 @@ public class AddNewContact extends AppCompatActivity {
     else
             Toast.makeText(this,"Error:",Toast.LENGTH_LONG).show();
 }
+    public void setToolbar(){
+
+        toolbar = (Toolbar) findViewById(R.id.toolbarNew);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Add New Contact");
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+
+
+            }
+        });
+
+    }
 }
 

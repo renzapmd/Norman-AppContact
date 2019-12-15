@@ -10,14 +10,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
-import com.example.norman_appcontact.Contact;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,23 +27,25 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class UpdateContact extends AppCompatActivity {
+
     EditText edtId,edtName,edtPhone,edtEmail;
     ImageView imgPicture;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
-    ImageButton btnChoose;
+    Button btnChoose;
+    Button btnCapture;
     Bitmap selectedBitmap;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_contact);
+
         addControl();
+        setToolbar();
         getContactDetail();
         addEvents();
     }
@@ -78,13 +79,13 @@ public class UpdateContact extends AppCompatActivity {
         });
     }
     public void addEvents() {
-       /* btnCapture.setOnClickListener(new View.OnClickListener() {
+        btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 capturePicture();
             }
         });
-            */
+
         btnChoose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,10 +98,10 @@ public class UpdateContact extends AppCompatActivity {
         startActivityForResult(pickPhoto, 200);
     }
 
-    /*private void capturePicture(){
+    private void capturePicture(){
         Intent  cInt = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cInt, 100);
-    }*/
+    }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100 && resultCode == RESULT_OK) {
             selectedBitmap = (Bitmap) data.getExtras().get("data");
@@ -121,17 +122,16 @@ public class UpdateContact extends AppCompatActivity {
         edtEmail=findViewById(R.id.edtEmail);
         edtName=findViewById(R.id.edtName);
         edtPhone=findViewById(R.id.edtPhone);
-        imgPicture = (ImageView)findViewById(R.id.imageView);
-        btnChoose = (ImageButton) findViewById(R.id.imageView);
-
+        imgPicture = (ImageView)findViewById(R.id.imageViewUpdate);
+        btnChoose = (Button) findViewById(R.id.btnChooseUP);
+        btnCapture = (Button) findViewById(R.id.btnCaptureUP);
     }
 
     public void updateContact(View view){
-        String key= edtId.getText().toString();
-        String phone= edtPhone.getText().toString();
-        String name=edtName.getText().toString();
-        String email=edtEmail.getText().toString();
-
+        String key = edtId.getText().toString();
+        String phone = edtPhone.getText().toString();
+        String name = edtName.getText().toString();
+        String email = edtEmail.getText().toString();
 
         if (!email.matches("") && !phone.matches("") && !name.matches("") && !key.matches("")&& !(selectedBitmap == null)) {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -161,6 +161,24 @@ public class UpdateContact extends AppCompatActivity {
         Intent intent = new Intent(UpdateContact.this, ContactList.class);
         finish();
         startActivity(intent);
+
+    }
+
+    public void setToolbar(){
+        toolbar =  findViewById(R.id.toolbarUP);
+        setSupportActionBar(toolbar);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Update Contact");
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+
+
+            }
+        });
 
     }
 }
